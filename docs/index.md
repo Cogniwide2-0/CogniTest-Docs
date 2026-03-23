@@ -1,31 +1,49 @@
 # Cognitest Engine Documentation
 
-Welcome to the Cognitest Engine documentation hub.
+Build, run, and scale hybrid automation from a single framework for web, API, and mobile testing.
 
-## Documentation Set
+## Framework Overview
 
-### 1) Technical Documentation
+Cognitest Engine is a TypeScript-based execution platform that standardizes test authoring and execution across three channels:
 
-For architects, senior automation engineers, and platform maintainers.
+- Web automation with Playwright
+- API automation with Playwright request context
+- Mobile automation with Appium and WebdriverIO
 
-- [Open Technical Documentation](./technical-documentation.md)
+It is designed for both local execution and enterprise pipeline integration.
 
-### 2) User Guide
+## Start Here
 
-For new users who want to create and run test cases quickly.
+- New to the framework: [User Guide](./user-guide.md)
+- Need architecture and internals: [Technical Documentation](./technical-documentation.md)
 
-- [Open User Guide](./user-guide.md)
+## By Role
 
-## Suggested GitHub Pages Setup
+- QA Engineer: [User Role Path](./user-guide.md#14-role-based-quick-paths)
+- SDET: [User Role Path](./user-guide.md#14-role-based-quick-paths)
+- DevOps Engineer: [Technical Role Path](./technical-documentation.md#14-role-based-technical-paths)
+- Architect or Platform Owner: [Technical Role Path](./technical-documentation.md#14-role-based-technical-paths)
 
-If you publish from the `docs/` folder:
+## What You Can Do
 
-1. Push repository to GitHub
-2. Go to **Settings → Pages**
-3. Under **Build and deployment**, choose:
-   - Source: **Deploy from a branch**
-   - Branch: `main` (or your default branch)
-   - Folder: `/docs`
-4. Save and wait for GitHub Pages URL generation
+- Trigger executions by suite, tags, retries, and parallelism
+- Run platform-specific tests under one `HybridTestCase` contract
+- Generate structured execution outputs for reporting systems
+- Extend integrations for defect systems, messaging, and persistence
 
-Once published, this `index.md` becomes your documentation landing page.
+## Recommended Learning Path
+
+1. Read [User Guide](./user-guide.md) sections 1 to 5 for setup and test authoring basics.
+2. Run one API or web test flow locally.
+3. Read [Technical Documentation](./technical-documentation.md) sections 2 to 5 to understand internals.
+4. Adopt the execution payload model in your CI trigger pipeline.
+
+## Detailed Walkthroughs
+
+- Quick onboarding walkthrough: [User Guide](./user-guide.md#11-detailed-walkthrough-from-zero-to-first-execution)
+- Runtime internals walkthrough: [Technical Documentation](./technical-documentation.md#13-detailed-walkthrough-request-to-result)
+- Role-based consumption path: [User Guide](./user-guide.md#14-role-based-quick-paths) and [Technical Documentation](./technical-documentation.md#14-role-based-technical-paths)
+
+## Publishing Notes
+
+This site is optimized for GitHub Pages branch-based publishing from `main` + `/docs`.

@@ -1,5 +1,17 @@
 # Cognitest Engine User Guide
 
+This guide helps you go from setup to your first successful hybrid execution with predictable outcomes.
+
+## Quick Navigation
+
+- Setup and prerequisites: sections 2 to 4
+- Test authoring model: sections 5 and 6
+- Running execution: sections 7 and 8
+- Results and reporting: section 9
+- End-to-end walkthrough: section 11
+- Troubleshooting: section 13
+- Role-based learning path: section 14
+
 ## 1. Who Is This Guide For
 
 This guide is for a new user who wants to:
@@ -270,7 +282,65 @@ Service endpoint:
 http://localhost:3000
 ```
 
-## 11. New User Workflow Summary
+## 11. Detailed Walkthrough (From Zero to First Execution)
+
+### Step 1: Install and validate setup
+
+Run:
+
+```bash
+npm install
+npx playwright install chromium
+npm run typecheck
+```
+
+Expected outcome:
+
+- Dependencies install without errors
+- Browser runtime is available for web execution
+- Type system is clean before your first run
+
+### Step 2: Add one focused test
+
+Create one small test in `src/tests/api/` or `src/tests/web/`.
+Start with a smoke-level assertion so failures are easy to diagnose.
+
+### Step 3: Register test and run locally
+
+Register the test in `src/execution/execution-engine.ts` and run:
+
+```bash
+npm run test
+```
+
+Expected outcome:
+
+- You get a clear pass/fail record for each selected test
+- Execution time and errors are visible in terminal output
+
+### Step 4: Trigger same run through service API
+
+Start service and trigger execution:
+
+```bash
+npm run dev
+curl -X POST http://localhost:3000/execute \
+  -H "Content-Type: application/json" \
+  -d '{"suite":"smoke","env":"staging","tags":["login"],"parallelism":1,"retries":0,"failFast":false,"defectProvider":"none"}'
+```
+
+Expected outcome:
+
+- API returns JSON summary
+- Result shape is suitable for CI and dashboard integrations
+
+### Step 5: Inspect artifacts and iterate
+
+- Check `reports/allure-results/` after execution
+- Generate HTML report with `npm run allure:generate`
+- Add tags and suites to improve selective execution
+
+## 12. New User Workflow Summary
 
 1. Install dependencies
 2. Add/modify test in `src/tests/*`
@@ -279,7 +349,7 @@ http://localhost:3000
 5. Review JSON summary and Allure output
 6. Iterate with suite/tag filtering
 
-## 12. Common Troubleshooting
+## 13. Common Troubleshooting
 
 ### Web test skipped or fails due to browser missing
 
@@ -304,3 +374,26 @@ npm run typecheck
 ```bash
 npm run lint
 ```
+
+## 14. Role-Based Quick Paths
+
+### QA Engineer
+
+1. Read sections 2, 4, and 5 for setup and folder conventions.
+2. Use section 6 to write one web or API smoke test.
+3. Run section 7 Option A to validate local execution.
+4. Use section 9 to read summary and report outputs.
+
+### SDET
+
+1. Read sections 6 and 8 for payload-driven execution control.
+2. Follow section 11 to move from local test to API-triggered run.
+3. Add suite and tag strategies from sections 8 and 12.
+4. Use section 13 for fast troubleshooting loops.
+
+### QA Lead or Test Manager
+
+1. Read sections 8, 9, and 12 to standardize run controls and outputs.
+2. Align your team on suite naming and tag taxonomy.
+3. Use API-triggered execution from section 7 Option B for CI adoption.
+4. Track pass/fail and artifact quality through Allure outputs.

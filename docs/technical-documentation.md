@@ -1,5 +1,16 @@
 # Cognitest Engine Technical Documentation
 
+This document explains how the framework is structured, how execution flows internally, and where to extend it for enterprise scale.
+
+## Quick Navigation
+
+- Platform capabilities and architecture: sections 1 and 2
+- Module-level design: sections 3 and 4
+- Integration contracts: section 5
+- Runtime and deployment model: sections 8 and 9
+- Request-to-result deep walkthrough: section 13
+- Role-based technical path: section 14
+
 ## 1. Overview
 
 Cognitest Engine is a hybrid test automation execution service built with Node.js and TypeScript.  
@@ -301,3 +312,58 @@ These interfaces enable future plug-in AI agents for:
 3. Persistent run analytics with PostgreSQL schema
 4. No-code orchestrator UI and workflow DSL
 5. AI-assisted test authoring, healing, and root-cause analysis
+
+## 13. Detailed Walkthrough (Request to Result)
+
+### Phase 1: Client sends execution request
+
+- Client or CI sends `POST /execute` with suite, tags, retries, and parallelism.
+- Service validates payload and forwards request to execution engine.
+
+### Phase 2: Engine resolves runnable test set
+
+- Engine loads registered tests.
+- Engine applies suite and tag filters.
+- Engine builds run metadata and execution context.
+
+### Phase 3: Runner executes tests with controls
+
+- Runner starts platform driver per test (`web`, `api`, or `mobile`).
+- Runner executes test body with retry policy.
+- Runner applies fail-fast behavior when configured.
+- Runner captures artifacts for failures and stores execution details.
+
+### Phase 4: Integrations and reporting
+
+- On final failure, defect manager route can create provider-specific defects.
+- Engine writes Allure-compatible outputs into reporting path.
+- Engine returns final summary JSON to service response.
+
+### Phase 5: Consumer feedback loop
+
+- CI consumes summary JSON for pass/fail gates.
+- Teams inspect Allure artifacts for triage.
+- Authors refine selectors, test data, and tags for stability and speed.
+
+## 14. Role-Based Technical Paths
+
+### Architect or Platform Owner
+
+1. Start with sections 1 and 2 for capability and architecture boundaries.
+2. Review sections 4 and 8 for execution behavior and control levers.
+3. Use sections 10 and 12 for security planning and roadmap alignment.
+4. Use section 13 to validate end-to-end architecture assumptions.
+
+### Framework Maintainer
+
+1. Focus on section 3 and section 4 for module ownership.
+2. Use section 5 for integration extension points.
+3. Validate runtime implications from section 9.
+4. Use section 13 to trace failures from request to artifact generation.
+
+### DevOps Engineer
+
+1. Start at section 9 for runtime, container, and pipeline strategy.
+2. Review section 8 for parallelism, retries, and fail-fast behavior.
+3. Use section 10 for environment and secret handling expectations.
+4. Use section 13 to map service interactions for observability setup.
