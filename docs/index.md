@@ -1,6 +1,14 @@
+---
+title: Documentation Home
+nav_order: 1
+---
+
 # Cognitest Engine Documentation
 
 Build, run, and scale hybrid automation from a single framework for web, API, and mobile testing.
+
+{: .tip }
+Use the role-based links below if you want the fastest path for your team profile.
 
 ## Framework Overview
 
@@ -14,8 +22,11 @@ It is designed for both local execution and enterprise pipeline integration.
 
 ## Start Here
 
-- New to the framework: [User Guide](./user-guide.md)
-- Need architecture and internals: [Technical Documentation](./technical-documentation.md)
+- First-time onboarding: [Getting Started](./getting-started.md)
+- Framework internals: [Architecture](./architecture.md)
+- Runtime and governance: [Operations](./operations.md)
+- Full user instructions: [User Guide](./user-guide.md)
+- Full technical internals: [Technical Documentation](./technical-documentation.md)
 
 ## By Role
 
@@ -47,3 +58,6 @@ It is designed for both local execution and enterprise pipeline integration.
 ## Publishing Notes
 
 This site is optimized for GitHub Pages branch-based publishing from `main` + `/docs`.
+
+{: .note }
+For best rendering quality, keep pages under `docs/` and prefer short sections with clear headings.

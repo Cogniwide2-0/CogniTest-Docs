@@ -1,6 +1,14 @@
+---
+title: Technical Documentation
+nav_order: 6
+---
+
 # Cognitest Engine Technical Documentation
 
 This document explains how the framework is structured, how execution flows internally, and where to extend it for enterprise scale.
+
+{: .warning }
+Treat integration sections as extension contracts. Validate authentication, rate limits, and payload schemas before production rollout.
 
 ## Quick Navigation
 

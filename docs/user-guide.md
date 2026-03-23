@@ -1,6 +1,14 @@
+---
+title: User Guide
+nav_order: 5
+---
+
 # Cognitest Engine User Guide
 
 This guide helps you go from setup to your first successful hybrid execution with predictable outcomes.
+
+{: .tip }
+If you are starting for the first time, go in this order: sections 2, 4, 6, 7, 9, and 11.
 
 ## Quick Navigation
 
