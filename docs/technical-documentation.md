@@ -5,10 +5,7 @@ nav_order: 6
 
 # Cognitest Engine Technical Documentation
 
-This document explains how the framework is structured, how execution flows internally, and where to extend it for enterprise scale.
-
-{: .warning }
-Treat integration sections as extension contracts. Validate authentication, rate limits, and payload schemas before production rollout.
+This document explains framework internals in a practical way, including source structure, execution lifecycle, and extension points.
 
 ## Quick Navigation
 
@@ -32,10 +29,15 @@ The service accepts execution requests and returns a summary with artifacts.
 Key folders:
 
 - `src/main.ts`: service entry point
+- `src/config/`: environment and capability loaders
 - `src/execution/`: test selection and run orchestration
+- `src/core/`: base test model, reusable actions, platform drivers
+- `src/components/`: web pages, API clients, mobile screens
+- `src/data/`: payload and user datasets plus file readers
 - `src/core/drivers/`: platform drivers
 - `src/tests/`: test cases
-- `src/components/`: reusable page objects and API clients
+- `src/integrations/`: JIRA, ADO, RabbitMQ, and DB connectors
+- `src/ai_agents/`: contracts for AI-based generation workflows
 - `src/utils/`: logging and utilities
 
 ## 3) Execution Flow
@@ -47,7 +49,24 @@ Key folders:
 5. Results and artifacts are written.
 6. Summary is returned in JSON.
 
-## 4) Example Execution Payload
+## 4) Folder Examples
+
+- `src/components/web/login-page.ts` defines reusable login action with healing selectors.
+- `src/components/api/health-client.ts` wraps endpoint request logic.
+- `src/components/mobile/login-screen.ts` defines mobile element actions using accessibility IDs.
+- `src/data/readers/json-reader.ts` loads JSON test data files.
+- `src/tests/web/smoke-web.test.ts` demonstrates web smoke validation.
+- `src/tests/api/smoke-api.test.ts` demonstrates API health assertion.
+- `src/tests/mobile/smoke-mobile.test.ts` demonstrates mobile smoke flow.
+
+## 5) How to Add a New Runnable Test
+
+1. Add a new test file in `src/tests/web/`, `src/tests/api/`, or `src/tests/mobile/`.
+2. Follow `HybridTestCase` structure.
+3. Import and register the test inside `src/execution/execution-engine.ts`.
+4. Run with `npm run test` or `POST /execute`.
+
+## 6) Example Execution Payload
 
 ```json
 {
@@ -60,14 +79,14 @@ Key folders:
 }
 ```
 
-## 5) Operations Notes
+## 7) Operations Notes
 
 - Start service: `npm run dev`
 - Run tests directly: `npm run test`
 - Generate report: `npm run allure:generate`
 - Report output: `reports/allure-report/index.html`
 
-## 6) Extension Points
+## 8) Extension Points
 
 - Add new tests under `src/tests/`
 - Add reusable components under `src/components/`

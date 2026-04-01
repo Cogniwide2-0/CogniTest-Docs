@@ -44,6 +44,8 @@ Create test files in:
 - API: `src/tests/api/`
 - Mobile: `src/tests/mobile/`
 
+After creating a new test, register it in `src/execution/execution-engine.ts` inside the `tests` array so it becomes runnable.
+
 ## 3) Web Test Case Example
 
 Use `LoginPage` and `CoreActions` for reusable actions and healing locators.
@@ -196,6 +198,14 @@ curl -X POST http://localhost:3000/execute \
 Execution payload file:
 
 - `src/data/execution-payload.json`
+
+You can tune:
+
+- `suite`: run only one suite or `all`
+- `tags`: run matching tagged tests
+- `parallelism`: concurrent execution count
+- `retries`: retry count for failures
+- `failFast`: stop run on first failure
 
 ## 9) Report Generation
 

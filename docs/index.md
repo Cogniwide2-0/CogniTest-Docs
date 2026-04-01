@@ -5,32 +5,33 @@ nav_order: 1
 
 # Cognitest Engine Documentation
 
-Simple, practical docs for running hybrid automation across web, API, and mobile.
+This documentation explains what the framework is, how to set it up from scratch, how each folder is used, how to create test cases, and how to deploy and run it in different environments.
 
-## Start in 3 Steps
+## What This Framework Is
 
-1. Set up your machine and install dependencies.
-2. Create or update a test.
-3. Run tests and check the report.
+Cognitest Engine is a hybrid automation framework built with Node.js and TypeScript.
 
-Use this page order:
+It supports:
 
-- [Getting Started](./getting-started.md)
-- [User Guide](./user-guide.md) for end-to-end test case creation, test data, locators, and reports
-- [Operations](./operations.md)
-- [Architecture](./architecture.md)
-- [Technical Documentation](./technical-documentation.md)
+- Web automation with Playwright
+- API automation with Playwright API context
+- Mobile automation with Appium + WebdriverIO
+- Local execution and REST API based execution
+- Allure report generation for test results
 
-## Who Should Read What
+## Recommended Reading Order
 
-- QA Engineer: [Getting Started](./getting-started.md) and [User Guide](./user-guide.md)
-- SDET: [User Guide](./user-guide.md) and [Technical Documentation](./technical-documentation.md)
-- DevOps Engineer: [Operations](./operations.md)
-- Architect: [Architecture](./architecture.md)
+1. [Getting Started](./getting-started.md) for clean setup from zero
+2. [Architecture](./architecture.md) for folder-by-folder understanding
+3. [User Guide](./user-guide.md) for creating tests with examples
+4. [Operations](./operations.md) for execution, reporting, and deployment
+5. [Technical Documentation](./technical-documentation.md) for internals and extension points
 
-## Framework Snapshot
+## End-to-End Coverage in These Docs
 
-- One framework for web, API, and mobile automation
-- Test execution through local run or REST API
-- Supports suite and tag-based filtering
-- Produces Allure-compatible result artifacts
+- Setup prerequisites and installation
+- Source folder map with examples
+- Web/API/Mobile sample test creation
+- Test data externalization and locator strategy
+- Run commands, REST trigger, and Allure reports
+- Docker, CI, and Kubernetes deployment guidance
