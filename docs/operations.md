@@ -1,32 +1,39 @@
 ---
 title: Operations
-nav_order: 4
+nav_order: 5
 ---
 
 # Operations
 
-Use this page for execution control, environment setup, and run governance.
+Use this page to run, monitor, and troubleshoot test execution.
 
-## Operations Scope
+## Run Commands
 
-- Runtime execution control
-- Deployment model references
-- CI/CD alignment paths
-- Reporting and observability touchpoints
+```bash
+npm run test
+npm run dev
+```
 
-## Run and Control
+## Trigger by API
 
-- Local and service execution: [User Guide section 7](./user-guide.md#7-execute-tests-locally)
-- Payload controls: [User Guide section 8](./user-guide.md#8-filter-and-control-execution)
-- Result consumption: [User Guide section 9](./user-guide.md#9-view-results)
+```bash
+curl -X POST http://localhost:3000/execute \
+  -H "Content-Type: application/json" \
+  -d '{"suite":"smoke","tags":["smoke"],"parallelism":1,"retries":0,"failFast":false,"defectProvider":"none"}'
+```
 
-## Platform Runtime
+## Reports
 
-- Runtime and DevOps details: [Technical Documentation section 9](./technical-documentation.md#9-deployment-and-devops)
-- Security and configuration: [Technical Documentation section 10](./technical-documentation.md#10-security-and-configuration)
-- Integration contracts: [Technical Documentation section 5](./technical-documentation.md#5-integrations)
+- Raw output: `reports/allure-results/`
+- HTML report: `reports/allure-report/index.html`
 
-## Operational Triage
+## Troubleshooting
 
-- Troubleshooting playbook: [User Guide section 13](./user-guide.md#13-common-troubleshooting)
-- Failure flow understanding: [Technical Documentation section 13](./technical-documentation.md#13-detailed-walkthrough-request-to-result)
+- Install browser runtime: `npx playwright install chromium`
+- Check types: `npm run typecheck`
+- Check lint: `npm run lint`
+
+## Read Next
+
+- Day-to-day usage: [User Guide](./user-guide.md)
+- System internals: [Technical Documentation](./technical-documentation.md)

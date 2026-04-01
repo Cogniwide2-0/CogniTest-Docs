@@ -1,30 +1,29 @@
 ---
 title: Architecture
-nav_order: 3
+nav_order: 4
 ---
 
 # Architecture
 
-Use this page to understand framework internals and extension boundaries.
+This page gives a quick technical picture without deep detail.
 
-## Architecture Reading Order
+## Main Building Blocks
 
-1. Platform overview and high-level flow.
-2. Module boundaries and ownership.
-3. Execution lifecycle and runtime behavior.
-4. Integration contracts and extension points.
+- Service layer: receives `/execute` requests
+- Execution layer: filters and runs tests
+- Driver layer: web, API, and mobile runtime
+- Test layer: platform-specific test files
+- Utility layer: logging and report helpers
 
-## Core References
+## Simple Flow
 
-- Overview: [Technical Documentation section 1](./technical-documentation.md#1-overview)
-- High-level architecture: [Technical Documentation section 2](./technical-documentation.md#2-high-level-architecture)
-- Source structure: [Technical Documentation section 3](./technical-documentation.md#3-source-structure)
-- Core modules: [Technical Documentation section 4](./technical-documentation.md#4-core-modules)
-- Execution modes and lifecycle: [Technical Documentation section 8](./technical-documentation.md#8-execution-modes)
-- Detailed request-to-result flow: [Technical Documentation section 13](./technical-documentation.md#13-detailed-walkthrough-request-to-result)
+1. Receive execution request
+2. Select tests by suite/tags
+3. Start platform driver
+4. Execute and collect artifacts
+5. Return summary
 
-## For Design Decisions
+## Read Next
 
-- Security and configuration: [Technical Documentation section 10](./technical-documentation.md#10-security-and-configuration)
-- AI and low-code readiness: [Technical Documentation section 11](./technical-documentation.md#11-ai-and-low-code-readiness)
-- Technical roadmap: [Technical Documentation section 12](./technical-documentation.md#12-technical-roadmap)
+- Full technical details: [Technical Documentation](./technical-documentation.md)
+- Practical test execution: [Operations](./operations.md)

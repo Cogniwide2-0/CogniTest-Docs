@@ -1,137 +1,64 @@
 ---
 title: User Guide
-nav_order: 5
+nav_order: 3
 ---
 
 # Cognitest Engine User Guide
 
-This guide helps you go from setup to your first successful hybrid execution with predictable outcomes.
-
-{: .tip }
-If you are starting for the first time, go in this order: sections 2, 4, 6, 7, 9, and 11.
+This guide shows complete, practical flow for web, API, and mobile testing: test creation, test data externalization, locator strategy, execution, and report generation.
 
 ## Quick Navigation
 
-- Setup and prerequisites: sections 2 to 4
-- Test authoring model: sections 5 and 6
-- Running execution: sections 7 and 8
-- Results and reporting: section 9
-- End-to-end walkthrough: section 11
-- Troubleshooting: section 13
-- Role-based learning path: section 14
+- Setup and prerequisites
+- Test design model (`HybridTestCase`)
+- Web/API/Mobile sample tests
+- External test data and locators
+- End-to-end execution and reporting
 
-## 1. Who Is This Guide For
-
-This guide is for a new user who wants to:
-
-- Set up the framework
-- Create a test case
-- Execute tests
-- View results and reports
-
-## 2. Prerequisites
-
-Install the following on your machine:
-
-- Node.js 20+
-- npm 10+
-- Docker Desktop (optional but recommended)
-
-Optional for full hybrid execution:
-
-- Playwright browser binaries
-- Appium server and emulator/device
-
-## 3. Clone and Open Project
+## 1) Setup and Prerequisites
 
 ```bash
 git clone <your-repo-url>
 cd <your-repo-folder>
-```
-
-## 4. Install Dependencies
-
-```bash
 npm install
-```
-
-Install Playwright Chromium for web testing:
-
-```bash
 npx playwright install chromium
 ```
 
-## 5. Understand Where to Create Test Cases
+For mobile execution also prepare:
 
-Use this location pattern:
+- Appium server
+- Android/iOS emulator or real device
 
-- Web tests: `src/tests/web/`
-- API tests: `src/tests/api/`
-- Mobile tests: `src/tests/mobile/`
+## 2) Test Design Model
 
-Reusable page/component objects:
+Every test follows `HybridTestCase` from `src/core/base-test.ts`:
 
-- Web components: `src/components/web/`
-- API clients: `src/components/api/`
-- Mobile page objects: `src/components/mobile/`
+- `id`, `name`, `suite`
+- `platform` as `web`, `api`, or `mobile`
+- `tags` for filtering
+- `run(context)` with platform context (`page`, `apiContext`, or `mobileDriver`)
 
-## 6. Create a New Test Case (Step-by-Step)
+Create test files in:
 
-### Step 1: Choose test type
+- Web: `src/tests/web/`
+- API: `src/tests/api/`
+- Mobile: `src/tests/mobile/`
 
-Decide platform:
+## 3) Web Test Case Example
 
-- Web
-- API
-- Mobile
-
-### Step 2: Create test file
-
-Example: create `src/tests/api/order-status.test.ts`
-
-### Step 3: Follow `HybridTestCase` contract
-
-Each test must define:
-
-- `id`
-- `name`
-- `suite`
-- `platform`
-- `tags`
-- `run(context)`
-
-Example API test:
-
-```ts
-import type { HybridTestCase } from "../../core/base-test";
-
-export const orderStatusTest: HybridTestCase = {
-  id: "API-010",
-  name: "Order status should return 200",
-  suite: "smoke",
-  platform: "api",
-  tags: ["order", "smoke"],
-  run: async ({ apiContext }) => {
-    if (!apiContext) {
-      throw new Error("API context missing");
-    }
-    const response = await apiContext.get("/orders/1001/status");
-    if (!response.ok()) {
-      throw new Error(`Status call failed: ${response.status()}`);
-    }
-  }
-};
-```
-
-Example Web test:
+Use `LoginPage` and `CoreActions` for reusable actions and healing locators.
 
 ```ts
 import type { HybridTestCase } from "../../core/base-test";
 import { CoreActions } from "../../core/core-actions";
+import { LoginPage } from "../../components/web/login-page";
+import { readJsonData } from "../../data/readers/json-reader";
 
-export const loginWebTest: HybridTestCase = {
+type User = { username: string; password: string };
+
+export const webLoginTest: HybridTestCase = {
   id: "WEB-010",
-  name: "User can open login page and validate heading",
+  name: "Web user can login",
   suite: "smoke",
   platform: "web",
   tags: ["login", "web"],
@@ -139,269 +66,166 @@ export const loginWebTest: HybridTestCase = {
     if (!page) {
       throw new Error("Web page context missing");
     }
-    await page.goto("https://example.com");
-    const heading = await page.locator("h1").textContent();
-    if (!heading?.includes("Example Domain")) {
-      throw new Error("Expected heading not visible");
-    }
+
+    const users = await readJsonData<User[]>("src/data/sample-users.json");
     const actions = new CoreActions(page);
-    await actions.runAccessibilityAudit();
+    const loginPage = new LoginPage(actions);
+
+    await page.goto("https://example.com/login");
+    await loginPage.login(users[0].username, users[0].password);
+    await actions.clickWithHealing(["[data-testid='profile']", "#profileMenu"]);
   }
 };
 ```
 
-Example Mobile test:
+## 4) API Test Case Example
+
+Use API client classes from `src/components/api/` for clean API test design.
 
 ```ts
 import type { HybridTestCase } from "../../core/base-test";
+import { HealthClient } from "../../components/api/health-client";
 
-export const loginMobileTest: HybridTestCase = {
+export const apiHealthTest: HybridTestCase = {
+  id: "API-010",
+  name: "Health API returns expected response",
+  suite: "smoke",
+  platform: "api",
+  tags: ["health", "api"],
+  run: async ({ apiContext }) => {
+    if (!apiContext) {
+      throw new Error("API context missing");
+    }
+
+    const client = new HealthClient(apiContext);
+    const response = await client.getHealth();
+    if (!response.ok()) {
+      throw new Error(`Health API failed: ${response.status()}`);
+    }
+  }
+};
+```
+
+## 5) Mobile Test Case Example
+
+Use mobile screen objects from `src/components/mobile/` and enable mobile in environment.
+
+```ts
+import type { HybridTestCase } from "../../core/base-test";
+import { SkipTestError } from "../../core/base-test";
+import { LoginScreen } from "../../components/mobile/login-screen";
+import { readJsonData } from "../../data/readers/json-reader";
+
+type User = { username: string; password: string };
+
+export const mobileLoginTest: HybridTestCase = {
   id: "MOB-010",
-  name: "Mobile user can view login screen",
+  name: "Mobile user can login",
   suite: "smoke",
   platform: "mobile",
   tags: ["login", "mobile"],
   run: async ({ mobileDriver }) => {
+    if (process.env.MOBILE_ENABLED !== "true") {
+      throw new SkipTestError("Mobile execution disabled");
+    }
     if (!mobileDriver) {
       throw new Error("Mobile driver not initialized");
     }
-    const loginButton = await mobileDriver.$("~login");
-    if (!(await loginButton.isDisplayed())) {
-      throw new Error("Login button not visible on mobile screen");
-    }
+
+    const users = await readJsonData<User[]>("src/data/sample-users.json");
+    const screen = new LoginScreen(mobileDriver);
+    await screen.login(users[0].username, users[0].password);
   }
 };
 ```
 
-### Web vs Mobile onboarding checklist
+## 6) Test Data Externalization
 
-| Area | Web App Testing | Mobile App Testing |
-|---|---|---|
-| Test location | `src/tests/web/` | `src/tests/mobile/` |
-| Component location | `src/components/web/` | `src/components/mobile/` |
-| Driver runtime | Playwright Chromium | Appium + WebdriverIO |
-| Local prerequisite | `npx playwright install chromium` | Start Appium server and emulator/device |
-| Context used in `run()` | `page` | `mobileDriver` |
-| Common selector style | CSS selectors | Accessibility ID (`~login`) |
-| Quick run | `npm run test` | `npm run test` |
-| Common failure | Browser binary missing | Appium server/device unavailable |
-| First troubleshooting step | Reinstall Playwright browser | Verify Appium host/port and device session |
+Keep test data in files and read it at runtime:
 
-### Step 4: Register test in execution engine
+- Reader utility: `src/data/readers/json-reader.ts`
+- Example data file: `src/data/sample-users.json`
 
-Open `src/execution/execution-engine.ts` and add your test to the `tests` array.
+Example:
 
-## 7. Execute Tests Locally
+```ts
+const users = await readJsonData<Array<{ username: string; password: string }>>(
+  "src/data/sample-users.json"
+);
+```
 
-### Option A: Run sample execution directly
+Benefits:
+
+- No hardcoded credentials in test files
+- Easy environment-specific data replacement
+- Reusable data across web/API/mobile scenarios
+
+## 7) Locator Strategy
+
+Use stable selectors first and fallback selectors second.
+
+Recommended order:
+
+1. `data-testid` or accessibility ID
+2. Stable `id` or `name`
+3. CSS/XPath as fallback
+
+Current project examples:
+
+- Web healing selectors in `src/components/web/login-page.ts`
+- Mobile accessibility IDs in `src/components/mobile/login-screen.ts`
+- Healing helpers in `src/core/core-actions.ts`
+
+## 8) End-to-End Execution Flow
+
+Run test suite directly:
 
 ```bash
 npm run test
 ```
 
-### Option B: Run as microservice and trigger via API
-
-Start server:
+Run through service:
 
 ```bash
 npm run dev
-```
-
-Health check:
-
-```bash
-curl http://localhost:3000/health
-```
-
-Trigger run:
-
-```bash
 curl -X POST http://localhost:3000/execute \
   -H "Content-Type: application/json" \
-  -d '{
-    "suite": "smoke",
-    "env": "staging",
-    "tags": ["login", "checkout"],
-    "parallelism": 2,
-    "retries": 1,
-    "failFast": false,
-    "defectProvider": "none"
-  }'
+  -d @src/data/execution-payload.json
 ```
 
-## 8. Filter and Control Execution
+Execution payload file:
 
-Use payload options:
+- `src/data/execution-payload.json`
 
-- `suite`: run specific suite
-- `tags`: run by tags
-- `parallelism`: number of workers
-- `retries`: retry failed tests
-- `failFast`: stop on first failure
-- `defectProvider`: `jira`, `ado`, `both`, or `none`
+## 9) Report Generation
 
-## 9. View Results
+After execution:
 
-### JSON Summary
-
-The response from `/execute` returns:
-
-- total/passed/failed/skipped
-- per-test details
-- timing
-- error and artifact paths
-
-### Allure Artifacts
-
-Generated under:
-
-```text
-reports/allure-results/
-```
-
-Generate report:
+- Raw result files: `reports/allure-results/`
+- Generate HTML report:
 
 ```bash
 npm run allure:generate
 ```
 
-Then open:
+Open report:
 
 ```text
 reports/allure-report/index.html
 ```
 
-## 10. Run with Docker Compose
+## 10) Troubleshooting
 
-This starts:
-
-- Cognitest engine
-- Appium
-- PostgreSQL
-- RabbitMQ
-
-```bash
-docker compose up --build
-```
-
-Service endpoint:
-
-```text
-http://localhost:3000
-```
-
-## 11. Detailed Walkthrough (From Zero to First Execution)
-
-### Step 1: Install and validate setup
-
-Run:
-
-```bash
-npm install
-npx playwright install chromium
-npm run typecheck
-```
-
-Expected outcome:
-
-- Dependencies install without errors
-- Browser runtime is available for web execution
-- Type system is clean before your first run
-
-### Step 2: Add one focused test
-
-Create one small test in `src/tests/api/` or `src/tests/web/`.
-Start with a smoke-level assertion so failures are easy to diagnose.
-
-### Step 3: Register test and run locally
-
-Register the test in `src/execution/execution-engine.ts` and run:
-
-```bash
-npm run test
-```
-
-Expected outcome:
-
-- You get a clear pass/fail record for each selected test
-- Execution time and errors are visible in terminal output
-
-### Step 4: Trigger same run through service API
-
-Start service and trigger execution:
-
-```bash
-npm run dev
-curl -X POST http://localhost:3000/execute \
-  -H "Content-Type: application/json" \
-  -d '{"suite":"smoke","env":"staging","tags":["login"],"parallelism":1,"retries":0,"failFast":false,"defectProvider":"none"}'
-```
-
-Expected outcome:
-
-- API returns JSON summary
-- Result shape is suitable for CI and dashboard integrations
-
-### Step 5: Inspect artifacts and iterate
-
-- Check `reports/allure-results/` after execution
-- Generate HTML report with `npm run allure:generate`
-- Add tags and suites to improve selective execution
-
-## 12. New User Workflow Summary
-
-1. Install dependencies
-2. Add/modify test in `src/tests/*`
-3. Register test in execution engine
-4. Run locally (`npm run test`) or via API (`npm run dev` + `/execute`)
-5. Review JSON summary and Allure output
-6. Iterate with suite/tag filtering
-
-## 13. Common Troubleshooting
-
-### Web test skipped or fails due to browser missing
-
-Run:
-
-```bash
-npx playwright install chromium
-```
-
-### Mobile test skipped or fails due to Appium
-
-Ensure Appium server is running at configured host/port or use Docker Compose.
-
-### TypeScript validation
+- Browser missing: `npx playwright install chromium`
+- Mobile execution issue: validate Appium server and device
+- Type check:
 
 ```bash
 npm run typecheck
 ```
 
-### Lint validation
+- Lint:
 
 ```bash
 npm run lint
 ```
-
-## 14. Role-Based Quick Paths
-
-### QA Engineer
-
-1. Read sections 2, 4, and 5 for setup and folder conventions.
-2. Use section 6 to write one web or API smoke test.
-3. Run section 7 Option A to validate local execution.
-4. Use section 9 to read summary and report outputs.
-
-### SDET
-
-1. Read sections 6 and 8 for payload-driven execution control.
-2. Follow section 11 to move from local test to API-triggered run.
-3. Add suite and tag strategies from sections 8 and 12.
-4. Use section 13 for fast troubleshooting loops.
-
-### QA Lead or Test Manager
-
-1. Read sections 8, 9, and 12 to standardize run controls and outputs.
-2. Align your team on suite naming and tag taxonomy.
-3. Use API-triggered execution from section 7 Option B for CI adoption.
-4. Track pass/fail and artifact quality through Allure outputs.
